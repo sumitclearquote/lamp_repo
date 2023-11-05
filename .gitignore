@@ -1,1 +1,9 @@
 .DS_Store
+lamp_dataset/train
+lamp_dataset/val
+lamp_dataset/train.zip
+lamp_dataset/val.zip
+lamp_dataset/__MACOSX
+
+pretrained_models/mask_rcnn_swin_small_patch4_window7.pth
+pretrained_models/model_lamp_transformer_v_1.pth

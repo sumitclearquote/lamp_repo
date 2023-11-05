@@ -156,15 +156,6 @@ albu_transforms = [
     dict(type='ChannelShuffle', p=0.1),
     dict(type='RGBShift', p=0.15),
     dict(type='Affine', shear=(-10, 10), rotate=(-10, 10), p=0.2),
-    '''
-    dict(
-        type='OneOf',
-        transforms=[
-            dict(type='Blur', blur_limit=3, p=1.0),
-            dict(type='MedianBlur', blur_limit=3, p=1.0)
-        ],
-        p=0.2)
-    '''
 ]
 train_pipeline = [
     dict(type='LoadImageFromFile'),
