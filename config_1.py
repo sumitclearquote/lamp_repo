@@ -28,7 +28,7 @@ model = dict(
         feat_channels=256,
         anchor_generator=dict(
             type='AnchorGenerator',
-            scales=[8],
+            scales=[8,16,32],
             ratios=[0.5, 1.0, 2.0],
             strides=[4, 8, 16, 32, 64]),
         bbox_coder=dict(
@@ -136,11 +136,11 @@ log_config = dict(
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = './pretrained_models/mask_rcnn_swin_small_patch4_window7.pth'
-resume_from = './pretrained_models/model_lamp_transformer_v_1.pth'
+load_from = './logs/config_1/latest.pth'
+resume_from = None
 workflow = [('train', 1), ('val', 1)]
 img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+    mean=[128.97, 112.86, 110.66], std=[61.69, 63.55, 62.39], to_rgb=True)
 albu_transforms = [
     dict(
         type='ShiftScaleRotate',
@@ -154,13 +154,13 @@ albu_transforms = [
         contrast_limit=[-0.3, 0.3],
         p=0.3),
     dict(type='ChannelShuffle', p=0.1),
-    dict(type='RGBShift', p=0.15),
+    dict(type='RGBShift', p=0.10),
     dict(type='Affine', shear=(-10, 10), rotate=(-10, 10), p=0.2),
 ]
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True, with_mask=False),
-    dict(type='Resize', img_scale=(500, 450), keep_ratio=True),
+    dict(type='Resize', img_scale=(600, 448), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=1e-05),
     dict(type='Pad', size_divisor=32),
     dict(
@@ -176,8 +176,8 @@ train_pipeline = [
         skip_img_without_anno=True),
     dict(
         type='Normalize',
-        mean=[123.675, 116.28, 103.53],
-        std=[58.395, 57.12, 57.375],
+        mean=[128.97, 112.86, 110.66],
+        std=[61.69, 63.55, 62.39],
         to_rgb=True),
     dict(type='DefaultFormatBundle'),
     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
@@ -186,15 +186,15 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(500, 450),
+        img_scale=(600, 448),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
             dict(
                 type='Normalize',
-                mean=[123.675, 116.28, 103.53],
-                std=[58.395, 57.12, 57.375],
+                mean=[128.97, 112.86, 110.66],
+                std=[61.69, 63.55, 62.39],
                 to_rgb=True),
             dict(type='Pad', size_divisor=32),
             dict(type='ImageToTensor', keys=['img']),
@@ -228,5 +228,5 @@ data = dict(
         classes=classes,
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric=['bbox'])
-work_dir = './logs/config_1'
+work_dir = './logs/config_2'
 gpu_ids = range(0, 1)

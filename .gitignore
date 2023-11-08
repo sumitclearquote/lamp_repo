@@ -7,3 +7,9 @@ lamp_dataset/__MACOSX
 
 pretrained_models/mask_rcnn_swin_small_patch4_window7.pth
 pretrained_models/model_lamp_transformer_v_1.pth
+
+
+testing_auto/*
+
+
+logs/*
