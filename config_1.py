@@ -50,7 +50,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=7,
+            num_classes=1,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0.0, 0.0, 0.0, 0.0],
@@ -127,7 +127,7 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.1,
     min_lr_ratio=1e-05)
-runner = dict(type='EpochBasedRunner', max_epochs=30)
+runner = dict(type='EpochBasedRunner', max_epochs=10)
 checkpoint_config = dict(interval=1)
 log_config = dict(
     interval=1,
@@ -201,7 +201,7 @@ test_pipeline = [
             dict(type='Collect', keys=['img'])
         ])
 ]
-classes = ('fadelamp', 'cracked', 'scratch', 'broken', 'foggy', 'tear', 'clipsbroken')
+classes = ('fadelamp')
 dataset_type = 'CocoDataset'
 data_root = './lamp_dataset/'
 data = dict(
@@ -228,5 +228,5 @@ data = dict(
         classes=classes,
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric=['bbox'])
-work_dir = './logs/config_2'
+work_dir = './logs/config_fade'
 gpu_ids = range(0, 1)
