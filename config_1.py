@@ -202,7 +202,7 @@ test_pipeline = [
             dict(type='Collect', keys=['img'])
         ])
 ]
-classes = ('fadelamp', 'cracked', 'scratch', 'broken', 'foggy', 'tear','clipsbroken'),
+classes = ('fadelamp', 'cracked', 'scratch', 'broken', 'foggy', 'tear','clipsbroken')
 dataset_type = 'CocoDataset'
 data_root = './lamp_dataset/'
 data = dict(
