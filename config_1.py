@@ -50,7 +50,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=1,
+            num_classes=7,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0.0, 0.0, 0.0, 0.0],
@@ -122,12 +122,13 @@ optimizer = dict(
             norm=dict(decay_mult=0.0))))
 optimizer_config = dict(grad_clip=None)
 lr_config = dict(
-    policy='CosineAnnealing',
+    policy='step',
     warmup='linear',
     warmup_iters=500,
-    warmup_ratio=0.1,
-    min_lr_ratio=1e-05)
-runner = dict(type='EpochBasedRunner', max_epochs=25)
+    warmup_ratio=0.01,
+    gamma=0.85,
+    step=1)
+runner = dict(type='EpochBasedRunner', max_epochs=30)
 checkpoint_config = dict(interval=1)
 log_config = dict(
     interval=1,
@@ -136,7 +137,7 @@ log_config = dict(
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = './logs/config_1/latest.pth'
+load_from = './pretrained_models/model_lamp_transformer_v_1.pth'
 resume_from = None
 workflow = [('train', 1), ('val', 1)]
 img_norm_cfg = dict(
@@ -160,7 +161,7 @@ albu_transforms = [
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True, with_mask=False),
-    dict(type='Resize', img_scale=(512, 512), keep_ratio=False),
+    dict(type='Resize', img_scale=(576, 512), keep_ratio=False),
     dict(type='RandomFlip', flip_ratio=1e-05),
     dict(type='Pad', size_divisor=32),
     dict(
@@ -186,7 +187,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(512, 512),
+        img_scale=(576, 512),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=False),
@@ -201,7 +202,7 @@ test_pipeline = [
             dict(type='Collect', keys=['img'])
         ])
 ]
-classes = ('fadelamp',)
+classes = ('fadelamp', 'cracked', 'scratch', 'broken', 'foggy', 'tear','clipsbroken'),
 dataset_type = 'CocoDataset'
 data_root = './lamp_dataset/'
 data = dict(
@@ -228,5 +229,5 @@ data = dict(
         classes=classes,
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric=['bbox'])
-work_dir = './logs/config_fade_no_AR'
+work_dir = './logs/config_3'
 gpu_ids = range(0, 1)
