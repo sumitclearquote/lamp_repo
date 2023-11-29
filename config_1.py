@@ -161,7 +161,7 @@ albu_transforms = [
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True, with_mask=False),
-    dict(type='Resize', img_scale=(576, 512), keep_ratio=False),
+    dict(type='Resize', img_scale=(608, 512), keep_ratio=False),
     dict(type='RandomFlip', flip_ratio=1e-05),
     dict(type='Pad', size_divisor=32),
     dict(
@@ -187,7 +187,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(576, 512),
+        img_scale=(608, 512),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=False),
