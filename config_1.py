@@ -1,85 +1,64 @@
-custom_imports = dict(
-    imports=['mmpretrain.models'], allow_failed_imports=False)
-checkpoint_file ='https://download.openmmlab.com/mmclassification/v0/convnext/downstream/convnext-small_3rdparty_32xb128-noema_in1k_20220301-303e75e3.pth'  # noqa
-
 model = dict(
-    type='CascadeRCNN',
+    type='MaskRCNN',
+    pretrained=None,
     backbone=dict(
-        _delete_=True,
-        type='mmpretrain.ConvNeXt',
-        arch='small',
-        out_indices=[0, 1, 2, 3],
-        drop_path_rate=0.6,
-        layer_scale_init_value=1.0,
-        gap_before_final_norm=False,
-        init_cfg=dict(
-            type='Pretrained', checkpoint=checkpoint_file,
-            prefix='backbone.')),
+        type='SwinTransformer',
+        embed_dim=96,
+        depths=[2, 2, 18, 2],
+        num_heads=[3, 6, 12, 24],
+        window_size=7,
+        mlp_ratio=4.0,
+        qkv_bias=True,
+        qk_scale=None,
+        drop_rate=0.0,
+        attn_drop_rate=0.0,
+        drop_path_rate=0.2,
+        ape=False,
+        patch_norm=True,
+        out_indices=(0, 1, 2, 3),
+        use_checkpoint=False),
     neck=dict(
-            type='FPN',
-            in_channels=[96, 192, 384, 768],
-            out_channels = 256,
-            num_outs=5),
-    roi_head=dict(bbox_head=[
-        dict(
-            type='ConvFCBBoxHead',
-            num_shared_convs=4,
-            num_shared_fcs=1,
+        type='FPN',
+        in_channels=[96, 192, 384, 768],
+        out_channels=256,
+        num_outs=5),
+    rpn_head=dict(
+        type='RPNHead',
+        in_channels=256,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[8,16,32],
+            ratios=[0.5, 1.0, 2.0],
+            strides=[4, 8, 16, 32, 64]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0]),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
+    roi_head=dict(
+        type='StandardRoIHead',
+        bbox_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        bbox_head=dict(
+            type='Shared2FCBBoxHead',
             in_channels=256,
-            conv_out_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
             num_classes=7,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
-                target_means=[0., 0., 0., 0.],
+                target_means=[0.0, 0.0, 0.0, 0.0],
                 target_stds=[0.1, 0.1, 0.2, 0.2]),
             reg_class_agnostic=False,
-            reg_decoded_bbox=True,
-            norm_cfg=dict(type='SyncBN', requires_grad=True),
             loss_cls=dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='GIoULoss', loss_weight=10.0)),
-        dict(
-            type='ConvFCBBoxHead',
-            num_shared_convs=4,
-            num_shared_fcs=1,
-            in_channels=256,
-            conv_out_channels=256,
-            fc_out_channels=1024,
-            roi_feat_size=7,
-            num_classes=7,
-            bbox_coder=dict(
-                type='DeltaXYWHBBoxCoder',
-                target_means=[0., 0., 0., 0.],
-                target_stds=[0.05, 0.05, 0.1, 0.1]),
-            reg_class_agnostic=False,
-            reg_decoded_bbox=True,
-            norm_cfg=dict(type='SyncBN', requires_grad=True),
-            loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='GIoULoss', loss_weight=10.0)),
-        dict(
-            type='ConvFCBBoxHead',
-            num_shared_convs=4,
-            num_shared_fcs=1,
-            in_channels=256,
-            conv_out_channels=256,
-            fc_out_channels=1024,
-            roi_feat_size=7,
-            num_classes=7,
-            bbox_coder=dict(
-                type='DeltaXYWHBBoxCoder',
-                target_means=[0., 0., 0., 0.],
-                target_stds=[0.033, 0.033, 0.067, 0.067]),
-            reg_class_agnostic=False,
-            reg_decoded_bbox=True,
-            norm_cfg=dict(type='SyncBN', requires_grad=True),
-            loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='GIoULoss', loss_weight=10.0))
-    ]),
-    
+            loss_bbox=dict(type='L1Loss', loss_weight=1.0))),
     train_cfg=dict(
         rpn=dict(
             assigner=dict(
@@ -131,12 +110,11 @@ model = dict(
             nms=dict(type='nms', iou_threshold=0.5),
             max_per_img=100,
             mask_thr_binary=0.5)))
-
 optimizer = dict(
     type='AdamW',
-    lr=0.0001,
+    lr=0.00001,
     betas=(0.9, 0.999),
-    weight_decay=0.062,
+    weight_decay=0.065,
     paramwise_cfg=dict(
         custom_keys=dict(
             absolute_pos_embed=dict(decay_mult=0.0),
@@ -148,7 +126,7 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.01,
-    gamma=0.70,
+    gamma=0.65,
     step=1)
 runner = dict(type='EpochBasedRunner', max_epochs=30)
 checkpoint_config = dict(interval=1)
@@ -159,7 +137,7 @@ log_config = dict(
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = None
+load_from = './logs/config_3/epoch_12.pth'
 resume_from = None
 workflow = [('train', 1), ('val', 1)]
 img_norm_cfg = dict(
@@ -251,5 +229,5 @@ data = dict(
         classes=classes,
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric=['bbox'])
-work_dir = './logs/config_4_trial'
+work_dir = './logs/config_4'
 gpu_ids = range(0, 1)
