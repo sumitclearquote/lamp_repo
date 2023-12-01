@@ -28,7 +28,7 @@ model = dict(
         feat_channels=256,
         anchor_generator=dict(
             type='AnchorGenerator',
-            scales=[8,16,32],
+            scales=[4],
             ratios=[0.5, 1.0, 2.0],
             strides=[4, 8, 16, 32, 64]),
         bbox_coder=dict(
@@ -112,9 +112,9 @@ model = dict(
             mask_thr_binary=0.5)))
 optimizer = dict(
     type='AdamW',
-    lr=0.00001,
+    lr=6e-5,  #lower further
     betas=(0.9, 0.999),
-    weight_decay=0.065,
+    weight_decay=0.060,
     paramwise_cfg=dict(
         custom_keys=dict(
             absolute_pos_embed=dict(decay_mult=0.0),
@@ -137,7 +137,7 @@ log_config = dict(
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = './logs/config_3/epoch_12.pth'
+load_from = 'pretrained_models/mask_rcnn_swin_small_patch4_window7.pth'
 resume_from = None
 workflow = [('train', 1), ('val', 1)]
 img_norm_cfg = dict(
@@ -156,12 +156,12 @@ albu_transforms = [
         p=0.3),
     dict(type='ChannelShuffle', p=0.1),
     dict(type='RGBShift', p=0.10),
-    dict(type='Affine', shear=(-10, 10), rotate=(-10, 10), p=0.2),
+    dict(type='Affine', shear=(-10, 10), rotate=(-10, 10), p=0.2), #increase values
 ]
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True, with_mask=False),
-    dict(type='Resize', img_scale=(608, 512), keep_ratio=False),
+    dict(type='Resize', img_scale=[(960, 512), (832, 512)], keep_ratio=False), #Bigger input size
     dict(type='RandomFlip', flip_ratio=1e-05),
     dict(type='Pad', size_divisor=32),
     dict(
@@ -187,7 +187,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(608, 512),
+        img_scale= [(1024, 512), (960, 512), (832, 544), (768, 576)],
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=False),
@@ -229,5 +229,5 @@ data = dict(
         classes=classes,
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric=['bbox'])
-work_dir = './logs/config_4'
+work_dir = './logs/config_5'
 gpu_ids = range(0, 1)
