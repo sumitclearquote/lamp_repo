@@ -50,7 +50,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=7,
+            num_classes=6,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0.0, 0.0, 0.0, 0.0],
@@ -112,9 +112,9 @@ model = dict(
             mask_thr_binary=0.5)))
 optimizer = dict(
     type='AdamW',
-    lr=6e-5,  #lower further
+    lr=1e-5,  #lower further
     betas=(0.9, 0.999),
-    weight_decay=0.060,
+    weight_decay=0.07,
     paramwise_cfg=dict(
         custom_keys=dict(
             absolute_pos_embed=dict(decay_mult=0.0),
@@ -137,8 +137,8 @@ log_config = dict(
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = 'pretrained_models/mask_rcnn_swin_small_patch4_window7.pth'
-resume_from = None
+load_from = None
+resume_from = './logs/config_5/epoch_6.pth'
 workflow = [('train', 1), ('val', 1)]
 img_norm_cfg = dict(
     mean=[128.97, 112.86, 110.66], std=[61.69, 63.55, 62.39], to_rgb=True)
@@ -161,7 +161,7 @@ albu_transforms = [
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True, with_mask=False),
-    dict(type='Resize', img_scale=[(960, 512), (832, 512)], keep_ratio=False), #Bigger input size
+    dict(type='Resize', img_scale=[(1000, 600)], keep_ratio=True), #Bigger input size
     dict(type='RandomFlip', flip_ratio=1e-05),
     dict(type='Pad', size_divisor=32),
     dict(
@@ -187,10 +187,10 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale= [(1024, 512), (960, 512), (832, 544), (768, 576)],
+        img_scale= [(960, 512), (832, 544), (768, 576)],
         flip=False,
         transforms=[
-            dict(type='Resize', keep_ratio=False),
+            dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
             dict(
                 type='Normalize',
@@ -202,25 +202,25 @@ test_pipeline = [
             dict(type='Collect', keys=['img'])
         ])
 ]
-classes = ('fadelamp', 'cracked', 'scratch', 'broken', 'foggy', 'tear','clipsbroken')
+classes = ('fadelamp', 'cracked', 'scratch', 'foggy', 'tear','clipsbroken')
 dataset_type = 'CocoDataset'
 data_root = './lamp_dataset/'
 data = dict(
-    samples_per_gpu=8,
+    samples_per_gpu=6,
     workers_per_gpu=2,
     train=dict(
         type='CocoDataset',
         ann_file='./lamp_dataset/train/swin_lamp_train.json',
         img_prefix='./lamp_dataset/train/',
         classes=classes,
-        # filter_empty_gt=False,
+        filter_empty_gt=False,
         pipeline=train_pipeline),
     val=dict(
         type='CocoDataset',
         ann_file='./lamp_dataset/val/swin_lamp_val.json',
         img_prefix='./lamp_dataset/val/',
         classes=classes,
-        # filter_empty_gt=False,
+        filter_empty_gt=False,
         pipeline=test_pipeline),
     test=dict(
         type='CocoDataset',
@@ -229,5 +229,5 @@ data = dict(
         classes=classes,
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric=['bbox'])
-work_dir = './logs/config_5'
+work_dir = './logs/config_6'
 gpu_ids = range(0, 1)
