@@ -137,8 +137,8 @@ log_config = dict(
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = None
-resume_from = './logs/config_5/epoch_6.pth'
+load_from = './logs/config_5/epoch_6.pth'
+resume_from = None
 workflow = [('train', 1), ('val', 1)]
 img_norm_cfg = dict(
     mean=[128.97, 112.86, 110.66], std=[61.69, 63.55, 62.39], to_rgb=True)
