@@ -1,5 +1,4 @@
-from networks import ClassifierNet,ClassifierNet2, ResNet18, ResNet50, EfficientNetB4, \
-                        train_epoch, test_epoch
+from networks import ResNet18, ResNet50, EfficientNetB4, train_epoch, test_epoch
 
 from datasets import get_dataloader
 
