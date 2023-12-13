@@ -3,12 +3,11 @@ from networks import ClassifierNet,ClassifierNet2, ResNet18, ResNet50, Efficient
 
 from datasets import get_dataloader
 
-from inference import get_results
 import sys
 from torch.utils.data import DataLoader
 import torch
 from torchvision import transforms
-import albumentations as A
+#import albumentations as A
 from torch import nn
 import numpy as np
 from PIL import Image
@@ -16,8 +15,8 @@ import pandas as pd
 import wandb
 import signal
 from tqdm import tqdm
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
+#from sklearn.model_selection import train_test_split
+#from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 from warnings import filterwarnings as w
 w('ignore')
 import os
@@ -64,7 +63,7 @@ def train_model(data_dir, wandb, config, save_model = None):
         train_dl = get_dataloader(f"{data_dir}/train", batch_size, data_mean,
                                 data_std, img_size, dataset_type = "val", weights_sampler = True)
     
-    val_dl = get_dataloader(f"{data_dir}/train", batch_size, data_mean,
+    val_dl = get_dataloader(f"{data_dir}/val", batch_size, data_mean,
                               data_std, img_size, dataset_type = "val", weights_sampler = False)
 
 
@@ -72,8 +71,10 @@ def train_model(data_dir, wandb, config, save_model = None):
         print("Loading ResNet18 ..")
         model = ResNet18(num_classes, pretrained = cfg.train.pretrain)
     elif model_type == "resnet50":
+        print("Loading ResNet50 ..")
         model = ResNet50(num_classes, pretrained= cfg.train.pretrain)
     elif model_type == "efficientnetb4":
+        print("Loading EfficientNetB4 ..")
         model = EfficientNetB4(num_classes, pretrained= cfg.train.pretrain)
     
 
@@ -133,8 +134,8 @@ if __name__ == '__main__':
     parser.add_argument('--use_aug', '-a', action = 'store_true', help = "Color Name")
     parser.add_argument('--save_model', '-s', action = 'store_true', help = "Save Model?")
     parser.add_argument('--use_wandb', '-w', action = 'store_true', help = "Log results to wandb")
-    parser.add_argument('--batch_size', '-b', required =True,  help = "Training batch size")
-    parser.add_argument('--imsize', '-ims', required = True,help = "Img size to train on" )
+    parser.add_argument('--batch_size', '-b', required =False,  help = "Training batch size")
+    parser.add_argument('--imsize', '-ims', required = False,help = "Img size to train on" )
     '''
     parser.add_argument('--company_name', '-c', required= True, help = "Paint manufacturer name")
     parser.add_argument('--color', '-col', default = 'magmagrey', help = "Color Name")
