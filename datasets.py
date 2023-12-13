@@ -23,12 +23,12 @@ def get_transform(data_mean, data_std, img_size, dataset_type):
                     
                     #---------tweak augmentation
                     A.OneOf([
-                            A.ShiftScaleRotate(shift_limit=0.2, rotate_limit=15, interpolation = 1, p = 0.2),
-                            A.RandomBrightnessContrast(brightness_limit =[-0.2, 0.2], contrast_limit =[-0.3, 0.3], p = 0.2)
+                            A.ShiftScaleRotate(shift_limit=0.3, rotate_limit=25, interpolation = 1, p = 0.2),
+                            A.RandomBrightnessContrast(brightness_limit =[-0.2, 0.2], contrast_limit =[-0.2, 0.2], p = 0.2)
                             ], p = 0.3),
                                 
                     A.OneOf([
-                            A.ImageCompression(quality_lower=70, quality_upper=80, p = 0.2),
+                            A.ImageCompression(quality_lower=75, quality_upper=85, p = 0.2),
                             A.Affine(shear=(-8, 8), rotate=(-8, 8), p=0.2)
                             ], p =0.3),
                     #-----------------tweak augmentation
