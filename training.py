@@ -5,14 +5,14 @@ from train_utils import train_epoch, test_epoch
 from datasets import get_dataloader
 
 import sys
+import shutil
 from torch.utils.data import DataLoader
 import torch
 from torchvision import transforms
 #import albumentations as A
 from torch import nn
 import numpy as np
-from PIL import Image
-import pandas as pd
+from PIL import Image, ImageFile
 import wandb
 import signal
 from tqdm import tqdm
@@ -24,6 +24,9 @@ import os
 import argparse
 from cfg import cfg
 os.environ["PYTORCH_MPS_HIGH_WATERMARK_RATIO"] = "0.0"
+
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 device = "cuda" if torch.cuda.is_available()  else "cpu"
 print(f"{device} is available")
 
@@ -46,7 +49,6 @@ def train_model(data_dir, wandb, config, save_model = None):
     model_name= config['model_name']
     lr= config["learning_rate"]
     batch_size = config['batch_size']
-    company_name = config["company_name"]
     img_size= config["img_size"]
     weight_decay = config['weight_decay']
     save_model_dir = cfg.train.log_dir
@@ -201,12 +203,13 @@ if __name__ == '__main__':
     #Stops wandb logging when Ctrl+C is pressed
     signal.signal(signal.SIGINT, signal_handler)
     
+    shutil.copy('cfg.py', f"{log_dir}/cfg.py")
+
     #Create log dir and log the config
     text = f"{model_name} (epochs: {n_epochs}):-------------------\n"
     os.makedirs(log_dir, exist_ok=True)
     with open(f"{log_dir}/log.txt", 'a') as f:
         f.write(text)
-        f.write(cfg.pretty_text)
 
     
     model = train_model(data_dir, wandb, config, save_model =save_model)

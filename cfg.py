@@ -14,7 +14,7 @@ cfg.data.img_size = (224,416)  #(height, width)
 cfg.train.pretrain = True
 cfg.train.lr = 1e-4
 
-cfg.train.epochs = 60
+cfg.train.epochs = 2
 cfg.train.start_epoch = 0
 
 cfg.train.weight_decay = 0
@@ -30,7 +30,7 @@ cfg.train.uniqueid = "lampv1_13dec"
 
 cfg.train.model_type = "efficientnetb4"
 
-cfg.train.use_wandb = True
+cfg.train.use_wandb = False
 
 cfg.train.use_aug = True
 
