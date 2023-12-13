@@ -18,7 +18,7 @@ def train_epoch(model, train_loader, loss_fn, optimizer, device):
     all_gts = []
     all_preds = []
     for (data, target) in train_loader:
-        data = data.to(device)
+        data = data['image'].to(device)
         target = target.to(device)
         optimizer.zero_grad()
         
@@ -47,7 +47,7 @@ def test_epoch(model, val_loader, loss_fn, device):
     all_gts = []
     all_preds = []
     for (data, target) in val_loader:
-        data = data.to(device)
+        data = data['image'].to(device)
         target = target.to(device)
         with torch.no_grad():
             outputs = model(data)
