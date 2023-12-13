@@ -72,8 +72,8 @@ def get_dataloader(data_dir, batch_size, data_mean, data_std, img_size, dataset_
         
         loader = DataLoader(dataset, batch_size = batch_size, sampler = sampler)
         
-        return loader, dataset
+        return loader
         
     # No weighted sampler for val set
     loader = DataLoader(dataset, batch_size = batch_size)
-    return loader, dataset
+    return loader
