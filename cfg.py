@@ -17,7 +17,7 @@ cfg.train.lr = 1e-4
 cfg.train.epochs = 30
 cfg.train.start_epoch = 0
 
-cfg.train.weight_decay = 0.02
+cfg.train.weight_decay = 0
 
 cfg.train.store_results = True
 
@@ -38,6 +38,6 @@ cfg.train.save_model = True
 
 cfg.train.classes = ["cracked", "fadelamp", "foggy"]
 
-cfg.train.batch_size = 28
+cfg.train.batch_size = 32
 
 cfg.train.log_dir = "classification_logs/config_1"
