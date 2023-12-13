@@ -202,11 +202,12 @@ if __name__ == '__main__':
     #Stops wandb logging when Ctrl+C is pressed
     signal.signal(signal.SIGINT, signal_handler)
     
+    #create log dir
+    os.makedirs(log_dir, exist_ok=True)
     shutil.copy('cfg.py', f"{log_dir}/cfg.py")
 
-    #Create log dir and log the config
+    #log the config
     text = f"{model_name} (epochs: {n_epochs}):-------------------\n"
-    os.makedirs(log_dir, exist_ok=True)
     with open(f"{log_dir}/log.txt", 'a') as f:
         f.write(text)
 
