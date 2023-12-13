@@ -26,6 +26,7 @@ testing_auto/*
 
 
 logs/*
+wandb/*
 
 orig_configs/*
 cascade-mask-rcnn_convnext-t-p4-w7_fpn_4conv1fc-giou_amp-ms-crop-3x_coco.py
