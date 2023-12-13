@@ -14,10 +14,10 @@ cfg.data.img_size = (224,416)  #(height, width)
 cfg.train.pretrain = True
 cfg.train.lr = 1e-4
 
-cfg.train.epochs = 2
+cfg.train.epochs = 30
 cfg.train.start_epoch = 0
 
-cfg.train.weight_decay = 0
+cfg.train.weight_decay = 0.02
 
 cfg.train.store_results = True
 
@@ -30,7 +30,7 @@ cfg.train.uniqueid = "lampv1_13dec"
 
 cfg.train.model_type = "efficientnetb4"
 
-cfg.train.use_wandb = False
+cfg.train.use_wandb = True
 
 cfg.train.use_aug = True
 
@@ -38,6 +38,6 @@ cfg.train.save_model = True
 
 cfg.train.classes = ["cracked", "fadelamp", "foggy"]
 
-cfg.train.batch_size = 16
+cfg.train.batch_size = 28
 
 cfg.train.log_dir = "classification_logs/config_1"

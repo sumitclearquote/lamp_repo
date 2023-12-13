@@ -30,11 +30,11 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 device = "cuda" if torch.cuda.is_available()  else "cpu"
 print(f"{device} is available")
 
-def log_print_metrics(loss, acc, prec, rec, f1, loader_type):
+def log_print_metrics(epoch, loss, acc, prec, rec, f1, loader_type):
     if loader_type == "train":
-        string  = f'Train Loss: {loss:.4f}, Acc: {acc:.4f}, Precision: {prec:.4f}, Recall: {rec:.4f}, F1-Score: {f1:.4f}'
+        string  = f'\nEpoch: {epoch}\nTrain Loss: {loss:.4f}, Acc: {acc:.4f}, Precision: {prec:.4f}, Recall: {rec:.4f}, F1-Score: {f1:.4f}\n'
     else:  
-        string  = f'Val Loss: {loss:.4f}, Acc: {acc:.4f}, Precision: {prec:.4f}, Recall: {rec:.4f}, F1-Score: {f1:.4f}'
+        string  = f'Val Loss: {loss:.4f}, Acc: {acc:.4f}, Precision: {prec:.4f}, Recall: {rec:.4f}, F1-Score: {f1:.4f}\n'
     
     print(string)
     with open(f"{log_dir}/log.txt", 'a') as f:
@@ -103,9 +103,8 @@ def train_model(data_dir, wandb, config, save_model = None):
             wandb.log({"Learning_Rate": optimizer.param_groups[0]['lr']}, step = epoch)
                                                                 
         if (epoch+1) % 1 == 0:
-            print("\nEpoch: ", epoch)
-            log_print_metrics(train_loss, train_acc, train_prec, train_rec, train_f1, loader_type='train')
-            log_print_metrics(val_loss, val_acc, val_prec, val_rec, val_f1, loader_type='val')
+            log_print_metrics(epoch, train_loss, train_acc, train_prec, train_rec, train_f1, loader_type='train')
+            log_print_metrics(epoch, val_loss, val_acc, val_prec, val_rec, val_f1, loader_type='val')
             print("----")
             
         if epoch!=0 and epoch % save_interval==0 and save_model:
