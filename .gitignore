@@ -1,14 +1,23 @@
 .DS_Store
+
+# Object detection datasets
 lamp_dataset/train
 lamp_dataset/val
 lamp_dataset/train.zip
 lamp_dataset/val.zip
 lamp_dataset/__MACOSX
 
+#Classification datasets
+classification_dataset/train
+classification_dataset/train.zip
+classification_dataset/val
+classification_dataset/val.zip
+classification_dataset/__MACOSX
 
 # python
 trial.ipynb
 
+#pretrained model (object detection)
 pretrained_models/mask_rcnn_swin_small_patch4_window7.pth
 pretrained_models/model_lamp_transformer_v_1.pth
 
