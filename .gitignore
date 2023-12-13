@@ -5,6 +5,10 @@ lamp_dataset/train.zip
 lamp_dataset/val.zip
 lamp_dataset/__MACOSX
 
+
+# python
+trial.ipynb
+
 pretrained_models/mask_rcnn_swin_small_patch4_window7.pth
 pretrained_models/model_lamp_transformer_v_1.pth
 
