@@ -17,7 +17,7 @@ cfg.train.lr = 1e-4
 cfg.train.epochs = 30
 cfg.train.start_epoch = 0
 
-cfg.train.weight_decay = 0
+cfg.train.weight_decay = 0.002
 
 cfg.train.store_results = True
 

@@ -23,7 +23,7 @@ def get_transform(data_mean, data_std, img_size, dataset_type):
                     
                     #---------tweak augmentation
                     A.OneOf([
-                            A.ShiftScaleRotate(shift_limit=0.2, rotate_limit=20, interpolation = 1, p = 0.2),
+                            A.ShiftScaleRotate(shift_limit=0.3, rotate_limit=30, interpolation = 1, p = 0.2),
                             A.RandomBrightnessContrast(brightness_limit =[-0.2, 0.2], contrast_limit =[-0.2, 0.2], p = 0.2)
                             ], p = 0.3),
                                 
