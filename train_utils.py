@@ -55,8 +55,8 @@ def test_epoch(model, val_loader, loss_fn, device):
         target = target.to(device)
         with torch.no_grad():
             outputs = model(data)
-            preds = np.apply_along_axis(operation,  axis = 1, arr = outputs.detach().numpy(), threshold = 0.5)
-            labels = target.numpy()
+            preds = np.apply_along_axis(operation,  axis = 1, arr = outputs.detach().cpu().numpy(), threshold = 0.5)
+            labels = target.cpu().numpy()
             loss = loss_fn(outputs, target)
             
         running_loss += loss.item() * data.size(0)
