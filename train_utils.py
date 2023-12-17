@@ -13,6 +13,9 @@ def operation(subarray, threshold = 0.5):
 
 # Train Loop-------------------------------------------------------------------------------------
 def train_epoch(model, train_loader, loss_fn, optimizer, device):
+    '''
+    Trains a single epoch
+    '''
     model.train()
     running_loss = 0
     all_gts = []
@@ -24,8 +27,8 @@ def train_epoch(model, train_loader, loss_fn, optimizer, device):
         with torch.enable_grad():
             outputs = model(data)
 
-            preds = np.apply_along_axis(operation,  axis = 1, arr = outputs.detach().numpy(), threshold = 0.5)
-            labels = target.numpy()
+            preds = np.apply_along_axis(operation,  axis = 1, arr = outputs.detach().cpu().numpy(), threshold = 0.5)
+            labels = target.cpu().numpy()
      
             loss = loss_fn(outputs, target)
             loss.backward()
@@ -48,6 +51,9 @@ def train_epoch(model, train_loader, loss_fn, optimizer, device):
 
 #Val Loop ----------------------------------------------------------------------------------------------------
 def test_epoch(model, val_loader, loss_fn, device):
+    '''
+    Tests a single epoch
+    '''
     model.eval()
     running_loss = 0
     for i, (data, target) in enumerate(val_loader):
