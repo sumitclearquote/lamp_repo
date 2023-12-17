@@ -35,7 +35,7 @@ cfg.train.uniqueid = "lampv1_15dec"
 
 cfg.train.model_type = "efficientnetb4"
 
-cfg.train.use_wandb = False
+cfg.train.use_wandb = True
 
 cfg.train.use_aug = True
 
@@ -43,6 +43,6 @@ cfg.train.save_model = True
 
 cfg.train.classes = ["cracked", "fadelamp", "foggy"]
 
-cfg.train.batch_size = 32
+cfg.train.batch_size = 16
 
 cfg.train.log_dir = "classification_logs/config_2"
