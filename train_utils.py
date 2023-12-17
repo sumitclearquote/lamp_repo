@@ -1,13 +1,13 @@
+import numpy as np
 import torch
-from sklearn.metrics import accuracy_score, precision_score, recall_score, \
-                            f1_score
+from metrics import calculate_metrics
 
-def calculate_metrics(gt, preds):
-    acc = accuracy_score(gt, preds)
-    prec = precision_score(gt, preds, average = 'weighted')
-    recall = recall_score(gt, preds, average = 'weighted')
-    f1  = f1_score(gt, preds, average = 'weighted')
-    return acc, prec, recall, f1
+
+def operation(subarray, threshold = 0.5):
+    '''
+    Function to apply on a subarray of an array. 
+    '''
+    return [1 if i > threshold else 0 for i in subarray]
 
 
 
@@ -17,25 +17,31 @@ def train_epoch(model, train_loader, loss_fn, optimizer, device):
     running_loss = 0
     all_gts = []
     all_preds = []
-    for (data, target) in train_loader:
-        data = data['image'].to(device)
+    for i, (data, target) in enumerate(train_loader):
+        data = data.to(device)
         target = target.to(device)
         optimizer.zero_grad()
-        
         with torch.enable_grad():
             outputs = model(data)
-            #print("outputs: ", outputs)
-            _, pred = torch.max(outputs, 1)
-            #print("target: ", target)
-            #print("target shape: ", target.shape)
+
+            preds = np.apply_along_axis(operation,  axis = 1, arr = outputs.detach().numpy(), threshold = 0.5)
+            labels = target.numpy()
+     
             loss = loss_fn(outputs, target)
             loss.backward()
             optimizer.step()
         
-        
         running_loss += loss.item() * data.size(0)
-        all_gts.extend(target.tolist())
-        all_preds.extend(pred.tolist())
+        if i==0:
+            all_gts = labels; all_preds = preds
+        if i!=0:
+            all_gts = np.concatenate((all_gts, labels), axis = 0)
+            all_preds = np.concatenate((all_preds, preds), axis = 0)
+        
+        #all_gts.extend(target.tolist())
+        #all_preds.extend(pred.tolist())
+        
+        
         
     acc, prec, recall, f1 = calculate_metrics(all_gts, all_preds)    
     return running_loss/len(train_loader), acc, prec, recall, f1
@@ -44,19 +50,21 @@ def train_epoch(model, train_loader, loss_fn, optimizer, device):
 def test_epoch(model, val_loader, loss_fn, device):
     model.eval()
     running_loss = 0
-    all_gts = []
-    all_preds = []
-    for (data, target) in val_loader:
-        data = data['image'].to(device)
+    for i, (data, target) in enumerate(val_loader):
+        data = data.to(device)
         target = target.to(device)
         with torch.no_grad():
             outputs = model(data)
-            _, pred = torch.max(outputs, 1)
+            preds = np.apply_along_axis(operation,  axis = 1, arr = outputs.detach().numpy(), threshold = 0.5)
+            labels = target.numpy()
             loss = loss_fn(outputs, target)
             
         running_loss += loss.item() * data.size(0)
-        all_gts.extend(target.tolist())
-        all_preds.extend(pred.tolist())
+        if i==0:
+            all_gts = labels; all_preds = preds
+        if i!=0:
+            all_gts = np.concatenate((all_gts, labels), axis = 0)
+            all_preds = np.concatenate((all_preds, preds), axis = 0)
         
     acc, prec, recall, f1 = calculate_metrics(all_gts, all_preds)    
     return running_loss/len(val_loader), acc, prec, recall, f1

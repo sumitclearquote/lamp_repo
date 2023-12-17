@@ -44,12 +44,13 @@ class ResNet50(nn.Module):
 class EfficientNetB4(nn.Module):
     def __init__(self, num_classes, pretrained = True):
         super(EfficientNetB4, self).__init__()
+        self.sigmoid = nn.Sigmoid()
         self.efficientnet = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_widese_b4', pretrained=pretrained)
         num_features = self.efficientnet.classifier.fc.in_features
         self.efficientnet.classifier.fc = nn.Linear(num_features, num_classes)
         
     def forward(self, x):
-        output = self.efficientnet(x)
+        output = self.sigmoid(self.efficientnet(x))
         return output
 
 

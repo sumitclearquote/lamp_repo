@@ -5,6 +5,7 @@ from train_utils import train_epoch, test_epoch
 from datasets import get_dataloader
 
 import sys
+import pandas as pd
 import shutil
 from torch.utils.data import DataLoader
 import torch
@@ -43,7 +44,7 @@ def log_print_metrics(epoch, loss, acc, prec, rec, f1, loader_type):
     
   
 
-def train_model(data_dir, wandb, config, save_model = None):
+def train_model(data_dir, traindf, valdf, wandb, config, save_model = None):
     
     model_type=  config['model_type']
     model_name= config['model_name']
@@ -58,15 +59,17 @@ def train_model(data_dir, wandb, config, save_model = None):
     data_mean  = cfg.data.data_mean
     data_std = cfg.data.data_std
     
+    train_data = traindf.values
+    val_data = valdf.values
     
     if config['Aug']:
-        train_dl = get_dataloader(f"{data_dir}/train", batch_size, data_mean,
+        train_dl = get_dataloader(f"{data_dir}/train",train_data, batch_size, data_mean,
                                 data_std, img_size, dataset_type = "train", weights_sampler = True)
     else: # Use same augs as val
-        train_dl = get_dataloader(f"{data_dir}/train", batch_size, data_mean,
+        train_dl = get_dataloader(f"{data_dir}/train",train_data, batch_size, data_mean,
                                 data_std, img_size, dataset_type = "val", weights_sampler = True)
     
-    val_dl = get_dataloader(f"{data_dir}/val", batch_size, data_mean,
+    val_dl = get_dataloader(f"{data_dir}/val",val_data, batch_size, data_mean,
                               data_std, img_size, dataset_type = "val", weights_sampler = False)
 
 
@@ -82,11 +85,13 @@ def train_model(data_dir, wandb, config, save_model = None):
     
 
     model.to(device)
-    loss_fn = nn.CrossEntropyLoss()
+    loss_fn = nn.BCELoss()  #nn.CrossEntropyLoss()
     
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
+    
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience = cfg.train.patience,
+                                                           factor = cfg.train.lr_factor) 
     
     
     print("\nTraining ..")
@@ -167,6 +172,9 @@ if __name__ == '__main__':
     
     data_dir = args.data.dataset_dir
     
+    train_csv_path = args.data.train_path
+    val_csv_path = args.data.val_path
+    
     img_size = args.data.img_size
     
     classes = args.train.classes
@@ -197,6 +205,10 @@ if __name__ == '__main__':
         
     print("Model Name: ", model_name)
     
+    # Read traindf and valdf
+    traindf = pd.read_csv(train_csv_path)
+    valdf = pd.read_csv(val_csv_path)
+    
     num_classes = len(classes)
     
     #Stops wandb logging when Ctrl+C is pressed
@@ -212,7 +224,7 @@ if __name__ == '__main__':
         f.write(text)
 
     
-    model = train_model(data_dir, wandb, config, save_model =save_model)
+    model = train_model(data_dir, traindf, valdf, wandb, config, save_model =save_model)
     
             
     #test_model(model, config)
