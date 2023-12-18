@@ -47,4 +47,4 @@ cfg.train.classes = ["cracked", "fadelamp", "foggy"]
 
 cfg.train.batch_size = 16
 
-cfg.train.log_dir = "classification_logs/config_2"
+cfg.train.log_dir = "classification_logs/config_3"
