@@ -33,7 +33,7 @@ cfg.train.save_interval = 2
 
 
 #new
-cfg.train.uniqueid = "lampv1_15dec"
+cfg.train.uniqueid = "lampv1_18dec"
 
 cfg.train.model_type = "efficientnetb4"
 
