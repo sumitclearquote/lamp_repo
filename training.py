@@ -106,9 +106,9 @@ def train_model(data_dir, traindf, valdf, wandb, config, save_model = None):
             for dat in ["Train", "Val"]:
                 for class_name in classes: #["cracked", "fadelamp", "foggy"]
                     if dat == "Train":
-                        wandb.log({f"{class_name.capitalze()}/{dat}/Accuracy" : class_train_metrics[class_name][0],f"{class_name.capitalze()}/{dat}/Precision" : class_train_metrics[class_name][1], f"{class_name.capitalze()}/{dat}/Recall":class_train_metrics[class_name][2],f"{class_name.capitalze()}/{dat}/F1":class_train_metrics[class_name][3],}, step = epoch)
+                        wandb.log({f"{class_name.capitalize()}/{dat}/Accuracy" : class_train_metrics[class_name][0],f"{class_name.capitalize()}/{dat}/Precision" : class_train_metrics[class_name][1], f"{class_name.capitalize()}/{dat}/Recall":class_train_metrics[class_name][2],f"{class_name.capitalize()}/{dat}/F1":class_train_metrics[class_name][3],}, step = epoch)
                     elif dat == "Val":
-                        wandb.log({f"{class_name.capitalze()}/{dat}/Accuracy" : class_val_metrics[class_name][0],f"{class_name.capitalze()}/{dat}/Precision" : class_val_metrics[class_name][1], f"{class_name.capitalze()}/{dat}/Recall":class_val_metrics[class_name][2],f"{class_name.capitalze()}/{dat}/F1":class_val_metrics[class_name][3],}, step = epoch)
+                        wandb.log({f"{class_name.capitalize()}/{dat}/Accuracy" : class_val_metrics[class_name][0],f"{class_name.capitalize()}/{dat}/Precision" : class_val_metrics[class_name][1], f"{class_name.capitalize()}/{dat}/Recall":class_val_metrics[class_name][2],f"{class_name.capitalize()}/{dat}/F1":class_val_metrics[class_name][3],}, step = epoch)
                         
             
             wandb.log({"Train/Loss": train_loss, "Train/Accuracy": train_acc, "Train/Precision":train_prec, "Train/Recall":train_rec, "Train/F1":train_f1}, step = epoch)
