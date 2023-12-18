@@ -67,7 +67,7 @@ def train_model(data_dir, traindf, valdf, wandb, config, save_model = None):
                                 data_std, img_size, dataset_type = "train", weights_sampler = True)
     else: # Use same augs as val
         train_dl = get_dataloader(f"{data_dir}/train",train_data, batch_size, data_mean,
-                                data_std, img_size, dataset_type = "val", weights_sampler = True)
+                                    data_std, img_size, dataset_type = "val", weights_sampler = True)
     
     val_dl = get_dataloader(f"{data_dir}/val",val_data, batch_size, data_mean,
                               data_std, img_size, dataset_type = "val", weights_sampler = False)
@@ -96,13 +96,21 @@ def train_model(data_dir, traindf, valdf, wandb, config, save_model = None):
     
     print("\nTraining ..")
     for epoch in tqdm(range(n_epochs)):
-        train_loss, train_acc, train_prec, train_rec, train_f1 = train_epoch(model, train_dl, loss_fn, optimizer, device)
-        val_loss, val_acc, val_prec, val_rec, val_f1 = test_epoch(model, val_dl, loss_fn, device)
+        train_loss, train_acc, train_prec, train_rec, train_f1, class_train_metrics = train_epoch(model, train_dl, loss_fn, optimizer, device)
+        val_loss, val_acc, val_prec, val_rec, val_f1, class_val_metrics = test_epoch(model, val_dl, loss_fn, device)
         scheduler.step(val_loss)
         
         
         if wandb:
             # Log metrics to wandb
+            for dat in ["Train", "Val"]:
+                for class_name in classes: #["cracked", "fadelamp", "foggy"]
+                    if dat == "Train":
+                        wandb.log({f"{class_name.capitalze()}/{dat}/Accuracy" : class_train_metrics[class_name][0],f"{class_name.capitalze()}/{dat}/Precision" : class_train_metrics[class_name][1], f"{class_name.capitalze()}/{dat}/Recall":class_train_metrics[class_name][2],f"{class_name.capitalze()}/{dat}/F1":class_train_metrics[class_name][3],}, step = epoch)
+                    elif dat == "Val":
+                        wandb.log({f"{class_name.capitalze()}/{dat}/Accuracy" : class_val_metrics[class_name][0],f"{class_name.capitalze()}/{dat}/Precision" : class_val_metrics[class_name][1], f"{class_name.capitalze()}/{dat}/Recall":class_val_metrics[class_name][2],f"{class_name.capitalze()}/{dat}/F1":class_val_metrics[class_name][3],}, step = epoch)
+                        
+            
             wandb.log({"Train/Loss": train_loss, "Train/Accuracy": train_acc, "Train/Precision":train_prec, "Train/Recall":train_rec, "Train/F1":train_f1}, step = epoch)
             wandb.log({"Val/Loss": val_loss, "Val/Accuracy": val_acc, "Val/Precision":val_prec, "Val/Recall":val_rec, "Val/F1":val_f1}, step = epoch)
             wandb.log({"Learning_Rate": optimizer.param_groups[0]['lr']}, step = epoch)
@@ -133,32 +141,6 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 if __name__ == '__main__':
-    
-    parser = argparse.ArgumentParser(description = "Script to perform inference on unseen test set")
-    
-    parser.add_argument('--model_type', '-m',required= False, choices = ["resnet18", "resnet50", "customnet", "newcustomnet", "mobnetv3"], help = "Model Type")
-    parser.add_argument('--uniqueid', '-u',required= False, help = "Unique identifier for the run (wandb)")
-    parser.add_argument('--use_aug', '-a', action = 'store_true', help = "Color Name")
-    parser.add_argument('--save_model', '-s', action = 'store_true', help = "Save Model?")
-    parser.add_argument('--use_wandb', '-w', action = 'store_true', help = "Log results to wandb")
-    parser.add_argument('--batch_size', '-b', required =False,  help = "Training batch size")
-    parser.add_argument('--imsize', '-ims', required = False,help = "Img size to train on" )
-    '''
-    parser.add_argument('--company_name', '-c', required= True, help = "Paint manufacturer name")
-    parser.add_argument('--color', '-col', default = 'magmagrey', help = "Color Name")
-    
-    '''
-    #Command line arguments
-    #cla = parser.parse_args()
-    #model_type = cla.model_type   #args.model_type
-    #unique_id =  cla.uniqueid
-    #use_aug =   cla.use_aug
-    #im_size =   int(cla.imsize)
-    #save_model = cla.save_model
-    #use_wandb =  cla.use_wandb 
-    
-    
-    
     
     #Config Arguments
     args = cfg
@@ -226,5 +208,3 @@ if __name__ == '__main__':
     
     model = train_model(data_dir, traindf, valdf, wandb, config, save_model =save_model)
     
-            
-    #test_model(model, config)

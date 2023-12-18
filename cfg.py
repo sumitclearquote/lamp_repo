@@ -15,19 +15,21 @@ cfg.data.val_path = f"{cfg.data.dataset_dir}/val/val.csv"
 cfg.data.img_size = (320,576)  #(height, width)
 
 cfg.train.pretrain = True
+
+
 cfg.train.lr = 1e-3
 cfg.train.patience =5
 cfg.train.lr_factor = 0.55
 
 
-cfg.train.epochs = 50
+cfg.train.epochs = 1
 cfg.train.start_epoch = 0
 
-cfg.train.weight_decay = 0.002
+
+cfg.train.weight_decay = 0 # 0
 
 
 cfg.train.save_interval = 2
-
 
 
 #new
@@ -37,7 +39,7 @@ cfg.train.model_type = "efficientnetb4"
 
 cfg.train.use_wandb = True
 
-cfg.train.use_aug = True
+cfg.train.use_aug = False
 
 cfg.train.save_model = True
 

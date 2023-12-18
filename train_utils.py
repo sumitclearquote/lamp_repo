@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from metrics import calculate_metrics
+from metrics import calculate_metrics, calculate_classwise_metrics
 
 
 def operation(subarray, threshold = 0.5):
@@ -20,6 +20,7 @@ def train_epoch(model, train_loader, loss_fn, optimizer, device):
     running_loss = 0
     all_gts = []
     all_preds = []
+    class_gt_preds = {'cracked': {'gts': [], 'preds': []}, 'fadelamp':  {'gts': [], 'preds': []}, 'foggy':  {'gts': [], 'preds': []}}
     for i, (data, target) in enumerate(train_loader):
         data = data.to(device)
         target = target.to(device)
@@ -35,19 +36,22 @@ def train_epoch(model, train_loader, loss_fn, optimizer, device):
             optimizer.step()
         
         running_loss += loss.item() * data.size(0)
+        
         if i==0:
             all_gts = labels; all_preds = preds
         if i!=0:
             all_gts = np.concatenate((all_gts, labels), axis = 0)
             all_preds = np.concatenate((all_preds, preds), axis = 0)
-        
-        #all_gts.extend(target.tolist())
-        #all_preds.extend(pred.tolist())
-        
-        
-        
-    acc, prec, recall, f1 = calculate_metrics(all_gts, all_preds)    
-    return running_loss/len(train_loader), acc, prec, recall, f1
+      
+            
+    class_gt_preds['cracked']['gts'].append(all_gts[:, 0]);     class_gt_preds['fadelamp']['gts'].append(all_gts[:, 1]);     class_gt_preds['foggy']['gts'].append(all_gts[:, 2])
+    class_gt_preds['cracked']['preds'].append(all_preds[:, 0]); class_gt_preds['fadelamp']['preds'].append(all_preds[:, 1]); class_gt_preds['foggy']['preds'].append(all_preds[:, 2])
+
+    class_metrics = calculate_classwise_metrics(class_gt_preds)
+    
+    acc, prec, recall, f1 = calculate_metrics(all_gts, all_preds) 
+    
+    return running_loss/len(train_loader), acc, prec, recall, f1, class_metrics
 
 #Val Loop ----------------------------------------------------------------------------------------------------
 def test_epoch(model, val_loader, loss_fn, device):
@@ -56,6 +60,7 @@ def test_epoch(model, val_loader, loss_fn, device):
     '''
     model.eval()
     running_loss = 0
+    class_gt_preds = {'cracked': {'gts': [], 'preds': []}, 'fadelamp':  {'gts': [], 'preds': []}, 'foggy':  {'gts': [], 'preds': []}}
     for i, (data, target) in enumerate(val_loader):
         data = data.to(device)
         target = target.to(device)
@@ -71,6 +76,13 @@ def test_epoch(model, val_loader, loss_fn, device):
         if i!=0:
             all_gts = np.concatenate((all_gts, labels), axis = 0)
             all_preds = np.concatenate((all_preds, preds), axis = 0)
+            
+            
+            
+    class_gt_preds['cracked']['gts'].append(all_gts[:, 0]);     class_gt_preds['fadelamp']['gts'].append(all_gts[:, 1]);     class_gt_preds['foggy']['gts'].append(all_gts[:, 2])
+    class_gt_preds['cracked']['preds'].append(all_preds[:, 0]); class_gt_preds['fadelamp']['preds'].append(all_preds[:, 1]); class_gt_preds['foggy']['preds'].append(all_preds[:, 2])
+
+    class_metrics = calculate_classwise_metrics(class_gt_preds)
         
     acc, prec, recall, f1 = calculate_metrics(all_gts, all_preds)    
-    return running_loss/len(val_loader), acc, prec, recall, f1
+    return running_loss/len(val_loader), acc, prec, recall, f1, class_metrics

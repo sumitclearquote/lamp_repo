@@ -47,7 +47,14 @@ class EfficientNetB4(nn.Module):
         self.sigmoid = nn.Sigmoid()
         self.efficientnet = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_widese_b4', pretrained=pretrained)
         num_features = self.efficientnet.classifier.fc.in_features
-        self.efficientnet.classifier.fc = nn.Linear(num_features, num_classes)
+        self.efficientnet.classifier.fc = nn.Sequential(nn.Linear(num_features, 1000),
+                                                        nn.SiLU(),
+                                                        nn.Linear(1000, 512),
+                                                        nn.Dropout(p=0.3),
+                                                        nn.SiLU(),
+                                                        nn.Linear(512, num_classes)
+                                                        )
+        #more linear layers
         
     def forward(self, x):
         output = self.sigmoid(self.efficientnet(x))
