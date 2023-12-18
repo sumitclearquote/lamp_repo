@@ -49,7 +49,6 @@ def calculate_binary_metrics(gt, preds):
     recall = recall_score(gt, preds, average = 'weighted')
     f1  = f1_score(gt, preds, average = 'weighted')
     return [acc, prec, recall, f1]
-]
 
 def calculate_classwise_metrics(class_gts_preds):
     ''' Returns acc, prec, rec, f1 for individual classes
