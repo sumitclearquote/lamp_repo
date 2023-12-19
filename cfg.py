@@ -22,7 +22,7 @@ cfg.train.patience =5
 cfg.train.lr_factor = 0.55
 
 
-cfg.train.epochs = 1
+cfg.train.epochs = 60
 cfg.train.start_epoch = 0
 
 
