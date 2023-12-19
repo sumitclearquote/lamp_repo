@@ -22,7 +22,7 @@ cfg.train.patience =5
 cfg.train.lr_factor = 0.55
 
 
-cfg.train.epochs = 60
+cfg.train.epochs = 50
 cfg.train.start_epoch = 0
 
 
@@ -33,13 +33,13 @@ cfg.train.save_interval = 2
 
 
 #new
-cfg.train.uniqueid = "lampv1_18dec"
+cfg.train.uniqueid = "lamp_v4_19dec"
 
 cfg.train.model_type = "efficientnetb4"
 
 cfg.train.use_wandb = True
 
-cfg.train.use_aug = False
+cfg.train.use_aug = True
 
 cfg.train.save_model = True
 
@@ -47,4 +47,4 @@ cfg.train.classes = ["cracked", "fadelamp", "foggy"]
 
 cfg.train.batch_size = 16
 
-cfg.train.log_dir = "classification_logs/config_3"
+cfg.train.log_dir = "classification_logs/config_4"

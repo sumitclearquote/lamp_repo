@@ -24,23 +24,23 @@ def get_transform(data_mean, data_std, img_size, dataset_type):
         transform = A.Compose([
                     A.Flip(p = 0.2),
                     A.Resize(height = img_size[0], width = img_size[1], always_apply=True),
-                    A.GaussNoise(var_limit=(60.0,200.0), p =0.4),
+                    A.GaussNoise(var_limit=(80.0,100.0), p =0.3),
                     
                     #---------tweak augmentation
-                    A.OneOf([A.RandomBrightnessContrast(brightness_limit =[-0.1, 0.1], contrast_limit =[-0.3, 0.3], p = 0.4),
-                                A.ChannelShuffle(p = 0.4)
-                            ], p=0.6),
+                    #A.OneOf([A.RandomBrightnessContrast(brightness_limit =[-0.1, 0.1], contrast_limit =[-0.3, 0.3], p = 0.4),
+                    #            A.ChannelShuffle(p = 0.4)
+                    #        ], p=0.6),
                     
                     
                     A.OneOf([
-                            A.ShiftScaleRotate(shift_limit=0.13, rotate_limit=15, interpolation = 1, p = 0.3),
+                            A.ShiftScaleRotate(shift_limit=0.11, rotate_limit=12, interpolation = 1, p = 0.3),
                             A.Affine(shear=(-8, 8), rotate=(-8, 8), p=0.3)
-                            ], p = 0.6),
+                            ], p = 0.4),
                        
                     A.OneOf([
                             A.ImageCompression(quality_lower=30, quality_upper=40, p = 0.3),
-                            A.Downscale(scale_min = 0.35, scale_max = 0.6, p = 0.3),
-                            ], p =0.6),
+                            A.Downscale(scale_min = 0.45, scale_max = 0.6, p = 0.3),
+                            ], p =0.4),
                     #-----------------tweak augmentation
                     
                     A.Normalize(mean = data_mean, std = data_std, always_apply = True),
